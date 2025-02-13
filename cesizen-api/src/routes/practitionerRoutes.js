@@ -3,36 +3,45 @@ const router = express.Router();
 const practitionerController = require('../controllers/practitionerController');
 const auth = require('../middlewares/auth');
 const checkRole = require('../middlewares/checkRole');
-const { body, param } = require('express-validator');
-const { validateRequest } = require('../middlewares/validators');
+const { body, param, validationResult } = require('express-validator');
 
-// Protection des routes : authentification + rôle PRACTITIONER
+// Middleware de validation
+const validateRequest = (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ 
+            success: false, 
+            errors: errors.array() 
+        });
+    }
+    next();
+};
+
+// Protection des routes
 router.use(auth, checkRole(['PRACTITIONER']));
 
-// Validation pour l'ajout de notes
+// Validation pour les notes
 const noteValidation = [
-    body('content').notEmpty().trim().escape(),
-    body('category').isIn(['CONSULTATION', 'SUIVI', 'PRESCRIPTION', 'AUTRE']),
+    body('patientId').isInt().withMessage('ID patient invalide'),
+    body('content').notEmpty().trim().withMessage('Contenu requis'),
+    body('category').isIn(['CONSULTATION', 'SUIVI', 'PRESCRIPTION', 'AUTRE'])
+        .withMessage('Catégorie invalide'),
     validateRequest
 ];
 
 // Routes
 router.get('/patients', practitionerController.getPatients);
-router.post('/patients', 
-    body('patientId').isInt(),
-    validateRequest,
-    practitionerController.addPatient
-);
 
-router.get('/patients/:patientId/notes',
-    param('patientId').isInt(),
-    validateRequest,
-    practitionerController.getPatientNotes
-);
+router.post('/patients', [
+    body('patientId').isInt().withMessage('ID patient invalide'),
+    validateRequest
+], practitionerController.addPatient);
 
-router.post('/notes',
-    noteValidation,
-    practitionerController.addFollowUpNote
-);
+router.get('/patients/:patientId/notes', [
+    param('patientId').isInt().withMessage('ID patient invalide'),
+    validateRequest
+], practitionerController.getPatientNotes);
+
+router.post('/notes', noteValidation, practitionerController.addFollowUpNote);
 
 module.exports = router;
