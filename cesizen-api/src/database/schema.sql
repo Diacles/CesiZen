@@ -35,3 +35,27 @@ CREATE TABLE password_reset_tokens (
 -- Index pour accélérer la recherche des tokens
 CREATE INDEX idx_valid_tokens ON password_reset_tokens (token, expires_at)
 WHERE used_at IS NULL;
+
+-- Association praticien-patient
+CREATE TABLE practitioner_patients (
+    practitioner_id INTEGER REFERENCES users(id),
+    patient_id INTEGER REFERENCES users(id),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (practitioner_id, patient_id)
+);
+
+-- Notes de suivi
+CREATE TABLE follow_up_notes (
+    id SERIAL PRIMARY KEY,
+    practitioner_id INTEGER REFERENCES users(id),
+    patient_id INTEGER REFERENCES users(id),
+    content TEXT NOT NULL,
+    category VARCHAR(50) CHECK (category IN ('CONSULTATION', 'SUIVI', 'PRESCRIPTION', 'AUTRE')),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Index pour optimiser les recherches
+CREATE INDEX idx_practitioner_patients ON practitioner_patients(practitioner_id);
+CREATE INDEX idx_follow_up_notes_patient ON follow_up_notes(patient_id);
+CREATE INDEX idx_follow_up_notes_practitioner ON follow_up_notes(practitioner_id);

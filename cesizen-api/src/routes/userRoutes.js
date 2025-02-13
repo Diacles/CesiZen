@@ -4,6 +4,7 @@ const userController = require('../controllers/userController');
 const auth = require('../middlewares/auth');
 const checkRole = require('../middlewares/checkRole');
 const adminController = require('../controllers/adminController');
+
 const {
     registerValidation,
     loginValidation,

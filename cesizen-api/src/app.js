@@ -6,7 +6,8 @@ require('dotenv').config();
 
 // Import des routes
 const userRoutes = require('./routes/userRoutes');
-
+const roleRoutes = require('./routes/roleRoutes');
+const practitionerRoutes = require('./routes/practitionerRoutes');
 // Initialisation de l'application Express
 const app = express();
 
@@ -23,6 +24,8 @@ app.get('/health', (req, res) => {
 
 // Routes de l'API
 app.use('/api/users', userRoutes);
+app.use('/api/roles', roleRoutes);
+app.use('/api/practitioners', practitionerRoutes);
 
 // Middleware pour gérer les routes non trouvées
 app.use((req, res, next) => {
