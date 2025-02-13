@@ -4,6 +4,9 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 require('dotenv').config();
 
+// Import des routes
+const userRoutes = require('./routes/userRoutes');
+
 // Initialisation de l'application Express
 const app = express();
 
@@ -11,19 +14,31 @@ const app = express();
 app.use(helmet());  // Sécurité
 app.use(cors());    // CORS
 app.use(morgan('dev')); // Logging
-app.use(express.json()); // Parser JSON (comme [FromBody] en C#)
+app.use(express.json()); // Parser JSON
 
-// Routes de base
+// Route de base pour vérifier que le serveur fonctionne
 app.get('/health', (req, res) => {
     res.status(200).json({ status: 'OK', timestamp: new Date() });
+});
+
+// Routes de l'API
+app.use('/api/users', userRoutes);
+
+// Middleware pour gérer les routes non trouvées
+app.use((req, res, next) => {
+    res.status(404).json({
+    success: false,
+    message: 'Route non trouvée'
+    });
 });
 
 // Gestionnaire d'erreurs global
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({
-    error: 'Une erreur interne est survenue',
-    timestamp: new Date()
+    success: false,
+    message: 'Une erreur interne est survenue',
+    error: process.env.NODE_ENV === 'development' ? err.message : undefined
     });
 });
 
