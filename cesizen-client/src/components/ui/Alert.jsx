@@ -64,4 +64,9 @@ const Alert = ({
   );
 };
 
+const AlertDescription = ({ children, className = '' }) => (
+  <p className={`text-sm mt-1 ${className}`}>{children}</p>
+);
+
 export default Alert;
+export { Alert, AlertDescription }

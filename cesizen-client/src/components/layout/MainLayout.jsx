@@ -2,7 +2,7 @@ import React from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { LogOut, User } from 'lucide-react';
-import Button from '../ui/Button';
+import { Button } from '../ui/Button';
 
 const MainLayout = ({ children }) => {
   const { user, logout } = useAuth();

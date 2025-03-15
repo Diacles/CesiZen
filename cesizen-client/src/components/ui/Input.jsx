@@ -1,46 +1,20 @@
-import React, { forwardRef } from 'react';
+import * as React from "react"
+import { cn } from "../../lib/utils"
 
-const Input = forwardRef(({
-  type = 'text',
-  label,
-  error,
-  className = '',
-  ...props
-}, ref) => {
-  const id = props.id || props.name;
-
+const Input = React.forwardRef(({ className, type, ...props }, ref) => {
   return (
-    <div className="space-y-2">
-      {label && (
-        <label
-          htmlFor={id}
-          className="block text-sm font-medium text-gray-700"
-        >
-          {label}
-        </label>
+    <input
+      type={type}
+      className={cn(
+        "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
+        className
       )}
-      <input
-        ref={ref}
-        type={type}
-        className={`
-          block w-full rounded-md
-          border border-gray-300
-          px-3 py-2
-          text-gray-900 placeholder-gray-500
-          focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500
-          disabled:opacity-50
-          ${error ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}
-          ${className}
-        `}
-        {...props}
-      />
-      {error && (
-        <p className="mt-1 text-sm text-red-600">{error}</p>
-      )}
-    </div>
-  );
-});
-
-Input.displayName = 'Input';
+      ref={ref}
+      {...props}
+    />
+  )
+})
+Input.displayName = "Input"
 
 export default Input;
+export { Input }
