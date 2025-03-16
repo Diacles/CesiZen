@@ -10,7 +10,7 @@ import { useAuth } from '../../contexts/AuthContext';
 const EmotionStatisticsPage = () => {
   const [period, setPeriod] = useState('week'); // week, month, year
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [setIsLoading] = useState(false);
+  const [isLoadingStats, setIsLoadingStats] = useState(false);
   const [error, setError] = useState("");
   const [categoryData, setCategoryData] = useState([]);
   const [emotionData, setEmotionData] = useState([]);
@@ -34,14 +34,14 @@ const EmotionStatisticsPage = () => {
       navigate('/login');
       return;
     }
-    
+
     if (isAuthenticated) {
       loadEmotionStats();
     }
   }, [isAuthenticated, isLoading, period, currentDate]);
 
   const loadEmotionStats = async () => {
-    setIsLoading(true);
+    setIsLoadingStats(true);
     setError("");
     
     try {
@@ -56,7 +56,7 @@ const EmotionStatisticsPage = () => {
       console.error("Erreur lors du chargement des statistiques:", err);
       setError("Erreur de connexion au serveur");
     } finally {
-      setIsLoading(false);
+      setIsLoadingStats(false);
     }
   };
 
@@ -203,7 +203,7 @@ const EmotionStatisticsPage = () => {
             </div>
           )}
 
-          {isLoading ? (
+          {isLoadingStats ? (
             <div className="flex justify-center py-16">
               <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
             </div>

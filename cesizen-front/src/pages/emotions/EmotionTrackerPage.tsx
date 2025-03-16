@@ -10,7 +10,7 @@ const EmotionTrackerPage = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [emotions, setEmotions] = useState([]);
   const [showAddEmotion, setShowAddEmotion] = useState(false);
-  const [setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [selectedEmotionCategory, setSelectedEmotionCategory] = useState(null);
   const [selectedEmotion, setSelectedEmotion] = useState(null);
   const [selectedEmotionId, setSelectedEmotionId] = useState(null);
@@ -23,19 +23,18 @@ const EmotionTrackerPage = () => {
   const [error, setError] = useState("");
   
   const navigate = useNavigate();
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
 
   useEffect(() => {
-    if (!isAuthenticated && !isLoading) {
+    if (!isAuthenticated && !authLoading) {
       navigate('/login');
       return;
     }
-
     if (isAuthenticated) {
       loadEmotionCategories();
       loadUserEmotions();
     }
-  }, [isAuthenticated, isLoading, currentDate, viewMode, navigate]);
+  }, [isAuthenticated, authLoading, currentDate, viewMode]);
 
   const loadEmotionCategories = async () => {
     try {
