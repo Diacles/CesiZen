@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, Menu, X, LogOut } from 'lucide-react';
+import { User, Menu, X, LogOut, FileText } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import apiService from '../../services/api/Service';
 import { listenToAuthEvents, checkIsAuthenticated } from '../../utils/authEvents';
@@ -71,6 +71,9 @@ const Header: React.FC = () => {
     navigate('/login');
   };
 
+  // Vérifier si l'utilisateur est admin
+  const isAdmin = isLoggedIn && user?.roles?.includes('ADMIN');
+
   return (
     <header className="bg-white shadow-sm">
       <div className="container mx-auto px-4 py-4">
@@ -86,13 +89,18 @@ const Header: React.FC = () => {
           {/* Navigation - Desktop */}
           <nav className="hidden md:flex space-x-8">
             <a href="/" className="text-gray-600 hover:text-primary transition">Accueil</a>
+            <a href="/articles" className="text-gray-600 hover:text-primary transition">Articles</a>
             {isLoggedIn && (
               <>
-                <a href="/dashboard" className="text-gray-600 hover:text-primary transition">Dashboard</a>
                 <a href="/emotions" className="text-gray-600 hover:text-primary transition">Émotions</a>
               </>
             )}
-            <a href="/articles" className="text-gray-600 hover:text-primary transition">Articles</a>
+            {isAdmin && (
+              <a href="/admin/articles" className="text-gray-600 hover:text-primary transition">
+                <FileText className="w-4 h-4 inline mr-1" />
+                Admin Articles
+              </a>
+            )}
           </nav>
 
           {/* Actions - Desktop */}
@@ -145,13 +153,18 @@ const Header: React.FC = () => {
           <div className="md:hidden mt-4 pt-4 border-t">
             <nav className="flex flex-col space-y-3">
               <a href="/" className="text-gray-600 hover:text-primary transition">Accueil</a>
+              <a href="/articles" className="text-gray-600 hover:text-primary transition">Articles</a>
               {isLoggedIn && (
                 <>
-                  <a href="/dashboard" className="text-gray-600 hover:text-primary transition">Dashboard</a>
                   <a href="/emotions" className="text-gray-600 hover:text-primary transition">Émotions</a>
                 </>
               )}
-              <a href="/articles" className="text-gray-600 hover:text-primary transition">Articles</a>
+              {isAdmin && (
+                <a href="/admin/articles" className="text-gray-600 hover:text-primary transition">
+                  <FileText className="w-4 h-4 inline mr-1" />
+                  Admin Articles
+                </a>
+              )}
               
               {isLoggedIn ? (
                 <>

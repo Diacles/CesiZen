@@ -10,44 +10,83 @@ import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
 import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 
 // Pages principales
-// Importer d'autres pages au fur et à mesure que nous les créons
-// import Dashboard from './pages/dashboard/Dashboard';
-// import EmotionTracker from './pages/emotions/EmotionTracker';
 import EmotionTrackerPage from './pages/emotions/EmotionTrackerPage';
 import EmotionStatisticsPage from './pages/emotions/EmotionStatisticsPage';
-
 import ProfilePage from './pages/profile/ProfilePage';
+
+// Pages d'articles
+import ArticlesListPage from './pages/articles/ArticlesListPage';
+import ArticleDetailPage from './pages/articles/ArticleDetailPage';
+
+// Pages d'administration des articles
+import AdminArticlesListPage from './pages/admin/ArticlesListPage';
+import ArticleFormPage from './pages/admin/ArticleFormPage';
 
 const App: React.FC = () => {
   return (
     <AuthProvider>
       <Router>
         <Routes>
-          {/* Routes d'authentification - sans le layout principal */}
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="/reset-password" element={<ResetPasswordPage />} />
+          {/* Routes d'authentification - avec layout */}
+          <Route path="/login" element={
+            <MainLayout>
+              <LoginPage />
+            </MainLayout>
+          } />
+          <Route path="/register" element={
+            <MainLayout>
+              <RegisterPage />
+            </MainLayout>
+          } />
+          <Route path="/forgot-password" element={
+            <MainLayout>
+              <ForgotPasswordPage />
+            </MainLayout>
+          } />
+          <Route path="/reset-password" element={
+            <MainLayout>
+              <ResetPasswordPage />
+            </MainLayout>
+          } />
 
           {/* Routes principales - avec le layout principal */}
           <Route path="/" element={
             <MainLayout>
-              {/* La page d'accueil sera importée ici quand elle sera prête */}
               <div className="container mx-auto px-4 py-8">
                 <h1 className="text-2xl font-bold">Bienvenue sur CESIZen</h1>
                 <p className="mt-4">L'application qui vous accompagne dans votre bien-être mental.</p>
               </div>
             </MainLayout>
           } />
-
-          {/* Ajouter d'autres routes au fur et à mesure du développement */}
-          {/* Exemple:
-          <Route path="/dashboard" element={
+          
+          {/* Routes des articles */}
+          <Route path="/articles" element={
             <MainLayout>
-              <Dashboard />
+              <ArticlesListPage />
             </MainLayout>
           } />
-          */}
+          <Route path="/articles/:slug" element={
+            <MainLayout>
+              <ArticleDetailPage />
+            </MainLayout>
+          } />
+          
+          {/* Routes d'administration des articles */}
+          <Route path="/admin/articles" element={
+            <MainLayout>
+              <AdminArticlesListPage />
+            </MainLayout>
+          } />
+          <Route path="/admin/articles/new" element={
+            <MainLayout>
+              <ArticleFormPage />
+            </MainLayout>
+          } />
+          <Route path="/admin/articles/edit/:id" element={
+            <MainLayout>
+              <ArticleFormPage />
+            </MainLayout>
+          } />
           
           <Route path="/profile" element={
             <MainLayout>
