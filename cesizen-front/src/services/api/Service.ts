@@ -56,7 +56,10 @@ const apiService = {
       });
       
       if (response.data.success && response.data.data?.token) {
+        // Assurez-vous que le token est correctement stocké
+        // IMPORTANT: Stockez le token AVANT de retourner la réponse
         localStorage.setItem('token', response.data.data.token);
+        console.log('Token stored in localStorage:', response.data.data.token);
       }
       
       return response.data;
@@ -68,6 +71,7 @@ const apiService = {
       };
     }
   },
+  
 
   register: async (userData: {
     firstName: string;

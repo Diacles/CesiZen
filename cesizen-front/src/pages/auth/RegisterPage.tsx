@@ -112,7 +112,7 @@ const RegisterPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+    <div className="flex items-center justify-center py-8 px-4">
       <div className="w-full max-w-md">
         {/* Logo et en-tête */}
         <div className="text-center mb-8">

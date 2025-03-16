@@ -1,11 +1,72 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { User, Menu, X, LogOut, Settings } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import apiService from '../../services/api/Service';
+import { listenToAuthEvents, checkIsAuthenticated } from '../../utils/authEvents';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // À remplacer par votre logique d'authentification
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const navigate = useNavigate();
   
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  
+  // Fonction pour vérifier le statut d'authentification
+  const checkAuthStatus = async () => {
+    console.log('Checking login status...');
+    const isAuthenticated = checkIsAuthenticated();
+    console.log('Token exists:', isAuthenticated);
+    
+    if (isAuthenticated) {
+      try {
+        const response = await apiService.getProfile();
+        console.log('Profile response:', response);
+        
+        if (response.success && response.data) {
+          setUser(response.data);
+          setIsLoggedIn(true);
+          console.log('User logged in:', response.data);
+        } else {
+          handleLogout();
+        }
+      } catch (error) {
+        console.error('Error fetching user profile:', error);
+        handleLogout();
+      }
+    } else {
+      setIsLoggedIn(false);
+    }
+  };
+  
+  // Écouter les événements d'authentification et vérifier au chargement
+  useEffect(() => {
+    console.log('Header component mounted or updated');
+    
+    // Vérifier l'état initial
+    checkAuthStatus();
+    
+    // Configurer l'écouteur d'événements
+    const cleanup = listenToAuthEvents((loggedIn) => {
+      console.log('Auth event handler triggered, loggedIn:', loggedIn);
+      if (loggedIn) {
+        checkAuthStatus();
+      } else {
+        setIsLoggedIn(false);
+        setUser(null);
+      }
+    });
+    
+    return cleanup;
+  }, []);
+  
+  const handleLogout = () => {
+    console.log('Logging out...');
+    apiService.logout();
+    setIsLoggedIn(false);
+    setUser(null);
+    navigate('/login');
+  };
 
   return (
     <header className="bg-white shadow-sm">
@@ -22,8 +83,12 @@ const Header: React.FC = () => {
           {/* Navigation - Desktop */}
           <nav className="hidden md:flex space-x-8">
             <a href="/" className="text-gray-600 hover:text-primary transition">Accueil</a>
-            <a href="/dashboard" className="text-gray-600 hover:text-primary transition">Dashboard</a>
-            <a href="/emotions" className="text-gray-600 hover:text-primary transition">Émotions</a>
+            {isLoggedIn && (
+              <>
+                <a href="/dashboard" className="text-gray-600 hover:text-primary transition">Dashboard</a>
+                <a href="/emotions" className="text-gray-600 hover:text-primary transition">Émotions</a>
+              </>
+            )}
             <a href="/articles" className="text-gray-600 hover:text-primary transition">Articles</a>
           </nav>
 
@@ -33,7 +98,7 @@ const Header: React.FC = () => {
               <div className="relative group">
                 <button className="flex items-center space-x-2 text-gray-700 hover:text-primary">
                   <User className="w-5 h-5" />
-                  <span>Mon compte</span>
+                  <span>{user?.firstName || 'Mon compte'}</span>
                 </button>
                 <div className="absolute right-0 w-48 mt-2 py-2 bg-white rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
                   <a href="/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
@@ -46,7 +111,7 @@ const Header: React.FC = () => {
                   </a>
                   <hr className="my-1" />
                   <button 
-                    onClick={() => console.log('Logout clicked')} 
+                    onClick={handleLogout} 
                     className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
                   >
                     <LogOut className="w-4 h-4 inline mr-2" />
@@ -81,8 +146,12 @@ const Header: React.FC = () => {
           <div className="md:hidden mt-4 pt-4 border-t">
             <nav className="flex flex-col space-y-3">
               <a href="/" className="text-gray-600 hover:text-primary transition">Accueil</a>
-              <a href="/dashboard" className="text-gray-600 hover:text-primary transition">Dashboard</a>
-              <a href="/emotions" className="text-gray-600 hover:text-primary transition">Émotions</a>
+              {isLoggedIn && (
+                <>
+                  <a href="/dashboard" className="text-gray-600 hover:text-primary transition">Dashboard</a>
+                  <a href="/emotions" className="text-gray-600 hover:text-primary transition">Émotions</a>
+                </>
+              )}
               <a href="/articles" className="text-gray-600 hover:text-primary transition">Articles</a>
               
               {isLoggedIn ? (
@@ -96,7 +165,7 @@ const Header: React.FC = () => {
                     Paramètres
                   </a>
                   <button 
-                    onClick={() => console.log('Logout clicked')} 
+                    onClick={handleLogout} 
                     className="text-left text-red-600 hover:text-red-700 transition"
                   >
                     <LogOut className="w-4 h-4 inline mr-2" />

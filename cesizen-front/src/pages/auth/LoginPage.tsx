@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../..
 import { Input } from '../../components/ui/Input';
 import { useNavigate } from 'react-router-dom';
 import apiService from '../../services/api/Service';
+import { triggerAuthEvent } from '../../utils/authEvents';
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -18,19 +19,37 @@ const LoginPage: React.FC = () => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
+    console.log('Attempting login...');
 
     try {
       const response = await apiService.login(email, password);
+      console.log('Login response:', response);
       
       if (response.success) {
-        // If remember me is checked, we could implement additional logic here
-        // For example, set a longer expiration on the token
+        console.log('Login successful, token saved');
+        
+        // Vérification explicite que localStorage a bien le token
+        const token = localStorage.getItem('token');
+        if (!token && response.token) {
+          // Backup en cas d'échec dans le service
+          localStorage.setItem('token', response.token);
+          console.log('Token manually set in localStorage');
+        }
+        
+        // Si l'option "Se souvenir de moi" est cochée
         if (rememberMe) {
           localStorage.setItem('rememberMe', 'true');
         }
         
-        // Redirect to dashboard after successful login
-        navigate('/dashboard');
+        // Important: Déclencher l'événement d'authentification
+        triggerAuthEvent(true);
+        console.log('Auth-change event dispatched');
+        
+        // Petit délai pour s'assurer que tout est bien mis à jour
+        setTimeout(() => {
+          // Redirection vers le dashboard après connexion réussie
+          navigate('/dashboard');
+        }, 100);
       } else {
         setError(response.message || 'Identifiants incorrects. Veuillez réessayer.');
       }
@@ -45,7 +64,6 @@ const LoginPage: React.FC = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
       <div className="w-full max-w-md">
-        {/* Logo et en-tête */}
         <div className="text-center mb-8">
           <div className="inline-block p-3 bg-gradient-to-br from-[#00BE62] to-[#00E074] rounded-xl mb-4">
             <User className="w-8 h-8 text-white" />
