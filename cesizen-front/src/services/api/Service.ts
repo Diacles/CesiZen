@@ -1,4 +1,5 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
+import { triggerAuthEvent } from '../../utils/authEvents';
 
 // Créer une instance axios avec la configuration de base
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
@@ -31,7 +32,7 @@ apiClient.interceptors.response.use(
     // Si le token est expiré (401), rediriger vers la page de connexion
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
-      window.location.href = '/login';
+      triggerAuthEvent(false);
     }
     return Promise.reject(error);
   }
@@ -50,18 +51,15 @@ const apiService = {
   // Authentification
   login: async (email: string, password: string) => {
     try {
-      const response: AxiosResponse<ApiResponse<{ token: string }>> = await apiClient.post('/users/login', {
-        email,
-        password,
-      });
+      const response = await apiClient.post('/users/login', { email, password });
       
-      if (response.data.success && response.data.data?.token) {
-        // Assurez-vous que le token est correctement stocké
-        // IMPORTANT: Stockez le token AVANT de retourner la réponse
-        localStorage.setItem('token', response.data.data.token);
-        console.log('Token stored in localStorage:', response.data.data.token);
+      // Adaptation à la structure de réponse réelle
+      if (response.data.success && response.data.token) {
+        localStorage.setItem('token', response.data.token);
+        console.log('Token stored:', localStorage.getItem('token'));
+        triggerAuthEvent(true);
       }
-      
+      console.log(JSON.stringify(response)) 
       return response.data;
     } catch (error: any) {
       return {
@@ -71,7 +69,6 @@ const apiService = {
       };
     }
   },
-  
 
   register: async (userData: {
     firstName: string;
@@ -164,7 +161,7 @@ const apiService = {
   // Méthode pour se déconnecter
   logout: () => {
     localStorage.removeItem('token');
-    window.location.href = '/login';
+    triggerAuthEvent(false);
   },
 };
 

@@ -29,5 +29,6 @@ export const listenToAuthEvents = (callback: (isLoggedIn: boolean) => void) => {
 // Vérifier si l'utilisateur est authentifié
 export const checkIsAuthenticated = (): boolean => {
   const token = localStorage.getItem('token');
+  console.log('Checking authentication, token exists:', !!token);
   return !!token;
 };

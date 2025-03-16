@@ -14,12 +14,13 @@ const Header: React.FC = () => {
   
   // Fonction pour vérifier le statut d'authentification
   const checkAuthStatus = async () => {
-    console.log('Checking login status...');
+    console.log('Checking login status in Header...');
     const isAuthenticated = checkIsAuthenticated();
-    console.log('Token exists:', isAuthenticated);
+    console.log('Token exists in Header check:', isAuthenticated);
     
     if (isAuthenticated) {
       try {
+        console.log('Fetching user profile...');
         const response = await apiService.getProfile();
         console.log('Profile response:', response);
         
@@ -28,6 +29,7 @@ const Header: React.FC = () => {
           setIsLoggedIn(true);
           console.log('User logged in:', response.data);
         } else {
+          console.log('Profile fetch failed, logging out');
           handleLogout();
         }
       } catch (error) {
@@ -35,20 +37,22 @@ const Header: React.FC = () => {
         handleLogout();
       }
     } else {
+      console.log('No token found, user is not logged in');
       setIsLoggedIn(false);
+      setUser(null);
     }
   };
   
   // Écouter les événements d'authentification et vérifier au chargement
   useEffect(() => {
-    console.log('Header component mounted or updated');
+    console.log('Header component mounted');
     
-    // Vérifier l'état initial
+    // Vérifier l'état initial au chargement
     checkAuthStatus();
     
-    // Configurer l'écouteur d'événements
+    // Configurer l'écouteur d'événements pour les changements d'état d'authentification
     const cleanup = listenToAuthEvents((loggedIn) => {
-      console.log('Auth event handler triggered, loggedIn:', loggedIn);
+      console.log('Auth event handler in Header triggered, loggedIn:', loggedIn);
       if (loggedIn) {
         checkAuthStatus();
       } else {
@@ -57,14 +61,13 @@ const Header: React.FC = () => {
       }
     });
     
+    // Nettoyer l'écouteur lors du démontage du composant
     return cleanup;
   }, []);
   
   const handleLogout = () => {
     console.log('Logging out...');
     apiService.logout();
-    setIsLoggedIn(false);
-    setUser(null);
     navigate('/login');
   };
 

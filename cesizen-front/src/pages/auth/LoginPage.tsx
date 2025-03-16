@@ -5,7 +5,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../..
 import { Input } from '../../components/ui/Input';
 import { useNavigate } from 'react-router-dom';
 import apiService from '../../services/api/Service';
-import { triggerAuthEvent } from '../../utils/authEvents';
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -26,30 +25,22 @@ const LoginPage: React.FC = () => {
       console.log('Login response:', response);
       
       if (response.success) {
-        console.log('Login successful, token saved');
+        console.log('Login successful');
         
-        // Vérification explicite que localStorage a bien le token
+        // Vérification que localStorage a bien le token
         const token = localStorage.getItem('token');
-        if (!token && response.token) {
-          // Backup en cas d'échec dans le service
-          localStorage.setItem('token', response.token);
-          console.log('Token manually set in localStorage');
-        }
+        console.log('Token in localStorage after login:', token);
         
         // Si l'option "Se souvenir de moi" est cochée
         if (rememberMe) {
           localStorage.setItem('rememberMe', 'true');
         }
         
-        // Important: Déclencher l'événement d'authentification
-        triggerAuthEvent(true);
-        console.log('Auth-change event dispatched');
-        
         // Petit délai pour s'assurer que tout est bien mis à jour
         setTimeout(() => {
           // Redirection vers le dashboard après connexion réussie
           navigate('/dashboard');
-        }, 100);
+        }, 300);
       } else {
         setError(response.message || 'Identifiants incorrects. Veuillez réessayer.');
       }
