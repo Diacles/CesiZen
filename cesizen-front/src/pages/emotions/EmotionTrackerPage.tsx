@@ -30,11 +30,12 @@ const EmotionTrackerPage = () => {
       navigate('/login');
       return;
     }
+
     if (isAuthenticated) {
       loadEmotionCategories();
       loadUserEmotions();
     }
-  }, [isAuthenticated, isLoading, currentDate, viewMode]);
+  }, [isAuthenticated, isLoading, currentDate, viewMode, navigate]);
 
   const loadEmotionCategories = async () => {
     try {

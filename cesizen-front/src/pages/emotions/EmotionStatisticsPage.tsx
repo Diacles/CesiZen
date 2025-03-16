@@ -34,7 +34,7 @@ const EmotionStatisticsPage = () => {
       navigate('/login');
       return;
     }
-
+    
     if (isAuthenticated) {
       loadEmotionStats();
     }
