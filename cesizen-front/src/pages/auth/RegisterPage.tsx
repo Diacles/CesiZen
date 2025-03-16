@@ -94,7 +94,7 @@ const RegisterPage: React.FC = () => {
           setGeneralError(response.message || 'Une erreur est survenue lors de l\'inscription.');
           if (response.errors && response.errors.length > 0) {
             const newErrors: Record<string, string> = {};
-            response.errors.forEach(err => {
+            response.errors.forEach((err: {param?: string; msg: string}) => {
               if (err.param) {
                 newErrors[err.param] = err.msg;
               }
