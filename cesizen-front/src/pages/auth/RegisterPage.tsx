@@ -54,7 +54,7 @@ const RegisterPage: React.FC = () => {
     }
 
     // Validation du mot de passe
-    const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
     if (!formData.password) {
       newErrors.password = 'Le mot de passe est requis';
     } else if (!passwordRegex.test(formData.password)) {

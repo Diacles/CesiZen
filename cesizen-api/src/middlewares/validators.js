@@ -20,7 +20,7 @@ const registerValidation = [
         .withMessage('Email invalide'),
     body('password')
         .isLength({ min: 8 })
-        .matches(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/)
+        .matches(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/)
         .withMessage('Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial'),
     body('firstName')
         .trim()
@@ -54,7 +54,7 @@ const resetPasswordValidation = [
         .withMessage('Token invalide'),
     body('newPassword')
         .isLength({ min: 8 })
-        .matches(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/)
+        .matches(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/)
         .withMessage('Nouveau mot de passe invalide'),
     validateRequest
 ];
