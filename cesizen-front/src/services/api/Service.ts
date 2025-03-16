@@ -131,14 +131,36 @@ const apiService = {
     }
   },
 
-  updateProfile: async (profileData: any) => {
+  updateProfile: async (profileData: {firstName?: string; lastName?: string; email?: string}) => {
     try {
-      const response: AxiosResponse<ApiResponse> = await apiClient.put('/users/profile', profileData);
+      // Convertir les noms de champs au format snake_case pour le backend
+      const apiData: Record<string, any> = {};
+      
+      if (profileData.firstName !== undefined) {
+        apiData.first_name = profileData.firstName;
+      }
+      if (profileData.lastName !== undefined) {
+        apiData.last_name = profileData.lastName;
+      }
+      if (profileData.email !== undefined) {
+        apiData.email = profileData.email;
+      }
+      
+      console.log("Données envoyées à l'API:", apiData);
+      
+      const response: AxiosResponse<ApiResponse> = await apiClient.put('/users/profile', apiData);
+      
+      // Si la mise à jour est réussie, déclencher l'événement d'authentification pour mettre à jour le contexte
+      if (response.data.success) {
+        triggerAuthEvent(true);
+      }
+      
       return response.data;
     } catch (error: any) {
+      console.error("Erreur lors de la mise à jour du profil:", error.response || error);
       return {
         success: false,
-        message: error.response?.data?.message || 'Une erreur est survenue',
+        message: error.response?.data?.message || 'Une erreur est survenue lors de la mise à jour du profil',
         errors: error.response?.data?.errors,
       };
     }

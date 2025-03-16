@@ -107,10 +107,10 @@ const userController = {
     // PUT /api/users/profile
     updateProfile: asyncHandler(async (req, res) => {
         try {
-            // En production, nous récupérerons l'ID depuis le token JWT
-            const userId = 1; // À remplacer par req.user.id plus tard
-            const { firstName, lastName, email } = req.body;
-
+            // Utiliser l'ID de l'utilisateur connecté à partir du middleware d'authentification
+            const userId = req.user.id;
+            const { first_name, last_name, email } = req.body;
+    
             const result = await db.query(
                 `UPDATE users
                 SET first_name = COALESCE($1, first_name),
@@ -119,16 +119,16 @@ const userController = {
                     updated_at = CURRENT_TIMESTAMP
                 WHERE id = $4
                 RETURNING id, email, first_name, last_name, updated_at`,
-                [firstName, lastName, email, userId]
+                [first_name, last_name, email, userId]
             );
-
+    
             if (result.rows.length === 0) {
                 return res.status(404).json({
                     success: false,
                     message: "Utilisateur non trouvé"
                 });
             }
-
+    
             res.status(200).json({
                 success: true,
                 data: result.rows[0]
@@ -138,7 +138,7 @@ const userController = {
             throw error;
         }
     }),
-
+    
     forgotPassword: asyncHandler(async (req, res) => {
         const { email } = req.body;
     

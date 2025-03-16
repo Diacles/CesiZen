@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, Menu, X, LogOut, Settings } from 'lucide-react';
+import { User, Menu, X, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import apiService from '../../services/api/Service';
 import { listenToAuthEvents, checkIsAuthenticated } from '../../utils/authEvents';
@@ -101,16 +101,12 @@ const Header: React.FC = () => {
               <div className="relative group">
                 <button className="flex items-center space-x-2 text-gray-700 hover:text-primary">
                   <User className="w-5 h-5" />
-                  <span>{user?.firstName || 'Mon compte'}</span>
+                  <span>{user?.firstName || user?.first_name || 'Mon compte'}</span>
                 </button>
                 <div className="absolute right-0 w-48 mt-2 py-2 bg-white rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
                   <a href="/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                     <User className="w-4 h-4 inline mr-2" />
                     Mon profil
-                  </a>
-                  <a href="/settings" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                    <Settings className="w-4 h-4 inline mr-2" />
-                    Paramètres
                   </a>
                   <hr className="my-1" />
                   <button 
@@ -162,10 +158,6 @@ const Header: React.FC = () => {
                   <a href="/profile" className="text-gray-600 hover:text-primary transition">
                     <User className="w-4 h-4 inline mr-2" />
                     Mon profil
-                  </a>
-                  <a href="/settings" className="text-gray-600 hover:text-primary transition">
-                    <Settings className="w-4 h-4 inline mr-2" />
-                    Paramètres
                   </a>
                   <button 
                     onClick={handleLogout} 

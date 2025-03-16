@@ -13,6 +13,7 @@ import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 // Importer d'autres pages au fur et à mesure que nous les créons
 // import Dashboard from './pages/dashboard/Dashboard';
 // import EmotionTracker from './pages/emotions/EmotionTracker';
+import ProfilePage from './pages/profile/ProfilePage';
 
 const App: React.FC = () => {
   return (
@@ -44,6 +45,12 @@ const App: React.FC = () => {
             </MainLayout>
           } />
           */}
+          
+          <Route path="/profile" element={
+            <MainLayout>
+              <ProfilePage />
+            </MainLayout>
+          } />
 
           {/* Route 404 */}
           <Route path="*" element={
