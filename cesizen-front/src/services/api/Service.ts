@@ -29,11 +29,7 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
-    // Si le token est expiré (401), rediriger vers la page de connexion
-    if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      triggerAuthEvent(false);
-    }
+    console.error('Erreur API détaillée:', JSON.stringify(error.response?.data, null, 2));
     return Promise.reject(error);
   }
 );

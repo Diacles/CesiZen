@@ -1,5 +1,3 @@
-// Fichier à créer dans src/pages/admin/ArticleFormPage.tsx
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
@@ -9,10 +7,121 @@ import { AlertTriangle, Save, ArrowLeft, Trash2, Eye } from 'lucide-react';
 import articleService, { ArticleCategory, ArticleFormData } from '../../services/api/articleService';
 import { useAuth } from '../../contexts/AuthContext';
 
-// Import de l'éditeur de texte rich text (React Quill)
-// Vous devrez installer cette dépendance : npm install react-quill
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
+// Import Tiptap
+import { useEditor, EditorContent } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+
+// Composant d'éditeur Tiptap
+const TiptapEditor = ({ value, onChange }: { value: string, onChange: (value: string) => void }) => {
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+    ],
+    content: value,
+    onUpdate: ({ editor }) => {
+      onChange(editor.getHTML());
+    },
+  });
+
+  // Toolbar simple
+  const MenuBar = () => {
+    if (!editor) {
+      return null;
+    }
+
+    return (
+      <div className="border-b border-gray-200 p-2 mb-4 flex flex-wrap gap-1">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => editor.chain().focus().toggleBold().run()}
+          className={editor.isActive('bold') ? 'bg-gray-100' : ''}
+        >
+          Gras
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => editor.chain().focus().toggleItalic().run()}
+          className={editor.isActive('italic') ? 'bg-gray-100' : ''}
+        >
+          Italique
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+          className={editor.isActive('heading', { level: 1 }) ? 'bg-gray-100' : ''}
+        >
+          H1
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+          className={editor.isActive('heading', { level: 2 }) ? 'bg-gray-100' : ''}
+        >
+          H2
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+          className={editor.isActive('heading', { level: 3 }) ? 'bg-gray-100' : ''}
+        >
+          H3
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => editor.chain().focus().toggleBulletList().run()}
+          className={editor.isActive('bulletList') ? 'bg-gray-100' : ''}
+        >
+          Liste à puces
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => editor.chain().focus().toggleOrderedList().run()}
+          className={editor.isActive('orderedList') ? 'bg-gray-100' : ''}
+        >
+          Liste numérotée
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => editor.chain().focus().toggleBlockquote().run()}
+          className={editor.isActive('blockquote') ? 'bg-gray-100' : ''}
+        >
+          Citation
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => editor.chain().focus().setHorizontalRule().run()}
+        >
+          Ligne horizontale
+        </Button>
+      </div>
+    );
+  };
+
+  return (
+    <div className="border border-gray-300 rounded-md">
+      <MenuBar />
+      <EditorContent editor={editor} className="prose max-w-none p-4 min-h-[350px]" />
+    </div>
+  );
+};
 
 const ArticleFormPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -47,7 +156,7 @@ const ArticleFormPage: React.FC = () => {
     if (isEditing && id) {
       loadArticle(parseInt(id));
     }
-  }, [isAuthenticated, user, isEditing, id]);
+  }, [isAuthenticated, user, isEditing, id, navigate]);
 
   const loadCategories = async () => {
     try {
@@ -115,18 +224,30 @@ const ArticleFormPage: React.FC = () => {
     setFormData(prev => ({ ...prev, published: e.target.checked }));
   };
 
+  // Dans ArticleFormPage.tsx
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
     setIsSaving(true);
     
+    const apiData = {
+      title: formData.title.trim(),
+      summary: formData.summary.trim(),
+      content: formData.content.trim(),
+      // Ne pas inclure imageUrl
+      published: formData.published,
+      categoryIds: formData.categoryIds.map(id => typeof id === 'string' ? parseInt(id) : id)
+    };
+    
+    console.log('Données à envoyer:', JSON.stringify(apiData));
+    
     try {
       let response;
       
       if (isEditing && id) {
-        response = await articleService.updateArticle(parseInt(id), formData);
+        response = await articleService.updateArticle(parseInt(id), apiData);
       } else {
-        response = await articleService.createArticle(formData);
+        response = await articleService.createArticle(apiData);
       }
       
       if (response.success) {
@@ -134,14 +255,20 @@ const ArticleFormPage: React.FC = () => {
       } else {
         setError(response.message || "Une erreur est survenue lors de l'enregistrement");
       }
-    } catch (err) {
-      console.error("Erreur lors de l'enregistrement de l'article:", err);
-      setError("Erreur de connexion au serveur");
+    } catch (err: any) {
+      console.error("Erreur complète:", err);
+      if (err.response?.data?.errors) {
+        const errorMessages = err.response.data.errors.map((e: any) => 
+          `${e.path || e.param}: ${e.msg}`).join(', ');
+        setError(`Validation échouée: ${errorMessages}`);
+      } else {
+        setError("Erreur de connexion au serveur");
+      }
     } finally {
       setIsSaving(false);
     }
   };
-
+  
   const handleDelete = async () => {
     if (!isEditing || !id) return;
     
@@ -166,19 +293,6 @@ const ArticleFormPage: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  // Configuration de l'éditeur rich text
-  const modules = {
-    toolbar: [
-      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-      ['bold', 'italic', 'underline', 'strike'],
-      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-      [{ 'indent': '-1'}, { 'indent': '+1' }],
-      [{ 'align': [] }],
-      ['link', 'image'],
-      ['clean']
-    ],
   };
 
   if (isLoading) {
@@ -282,43 +396,13 @@ const ArticleFormPage: React.FC = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <label htmlFor="imageUrl" className="block text-sm font-medium text-gray-700">
-                    URL de l'image
-                  </label>
-                  <Input
-                    id="imageUrl"
-                    name="imageUrl"
-                    value={formData.imageUrl}
-                    onChange={handleChange}
-                    placeholder="https://example.com/image.jpg"
-                    className="w-full"
-                  />
-                  {formData.imageUrl && (
-                    <div className="mt-2 border rounded-md overflow-hidden h-48">
-                      <img 
-                        src={formData.imageUrl} 
-                        alt="Aperçu" 
-                        className="w-full h-full object-contain"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.src = '/images/default-article.jpg';
-                        }}
-                      />
-                    </div>
-                  )}
-                </div>
-
-                <div className="space-y-2">
                   <label htmlFor="content" className="block text-sm font-medium text-gray-700">
                     Contenu *
                   </label>
                   <div className="min-h-[400px]">
-                    <ReactQuill
-                      theme="snow"
+                    <TiptapEditor
                       value={formData.content}
                       onChange={handleContentChange}
-                      modules={modules}
-                      className="h-80"
                     />
                   </div>
                 </div>

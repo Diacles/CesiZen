@@ -38,8 +38,8 @@ const LoginPage: React.FC = () => {
         
         // Petit délai pour s'assurer que tout est bien mis à jour
         setTimeout(() => {
-          // Redirection vers le dashboard après connexion réussie
-          navigate('/dashboard');
+          // Redirection vers le profil après connexion réussie
+          navigate('/profile');
         }, 300);
       } else {
         setError(response.message || 'Identifiants incorrects. Veuillez réessayer.');

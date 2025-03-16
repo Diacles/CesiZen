@@ -25,14 +25,18 @@ const articleValidation = [
         .withMessage('Le résumé ne peut pas dépasser 500 caractères'),
     body('content').notEmpty().trim()
         .withMessage('Le contenu est requis'),
-    body('imageUrl').optional().isURL()
-        .withMessage('L\'URL de l\'image doit être valide'),
+    // Rendre l'URL d'image optionnelle et permettre une chaîne vide
+    body('imageUrl').optional({ checkFalsy: true }).custom(value => {
+        if (!value) return true; // Autoriser une chaîne vide
+        return isURL(value); // Valider uniquement si une valeur est fournie
+    }).withMessage('L\'URL de l\'image doit être valide'),
     body('published').isBoolean()
         .withMessage('Le statut de publication doit être un booléen'),
     body('categoryIds').isArray()
         .withMessage('Les catégories doivent être fournies sous forme de tableau'),
     validateRequest
 ];
+
 
 // Routes publiques
 router.get('/', articleController.getAllArticles);
@@ -47,7 +51,10 @@ router.get('/:slug', articleController.getArticleBySlug);
 
 // Autres routes admin
 router.post('/', auth, checkRole(['ADMIN']), articleValidation, articleController.createArticle);
-router.put('/:id', auth, checkRole(['ADMIN']), articleValidation, articleController.updateArticle);
+router.put('/:id', auth, checkRole(['ADMIN']), (req, res, next) => {
+    console.log('Validation errors:', validationResult(req).array());
+    next();
+  }, articleValidation, articleController.updateArticle);
 router.delete('/:id', auth, checkRole(['ADMIN']), articleController.deleteArticle);
 
 module.exports = router;
