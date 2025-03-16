@@ -3,6 +3,7 @@ import { Mail, CheckCircle, AlertTriangle } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/Card';
 import { Input } from '../../components/ui/Input';
+import apiService from '../../services/api/Service';
 
 const ForgotPasswordPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -17,14 +18,22 @@ const ForgotPasswordPage: React.FC = () => {
     setIsLoading(true);
 
     try {
-      // Simuler une requête API
-      setTimeout(() => {
-        console.log('Reset password request for:', email);
+      // Appel API réel
+      const response = await apiService.forgotPassword(email);
+      
+      // Le backend renvoie toujours success=true pour des raisons de sécurité
+      // même si l'email n'est pas trouvé, pour éviter l'énumération des emails
+      if (response.success) {
         setSuccess(true);
-        setIsLoading(false);
-      }, 1000);
+        setEmail(''); // Réinitialiser le champ après succès
+      } else {
+        // Cela ne devrait pas arriver normalement avec l'API actuelle
+        setError(response.message || 'Une erreur est survenue. Veuillez réessayer.');
+      }
     } catch (err) {
       setError('Erreur lors de la demande de réinitialisation. Veuillez réessayer.');
+      console.error('Forgot password error:', err);
+    } finally {
       setIsLoading(false);
     }
   };
@@ -63,7 +72,7 @@ const ForgotPasswordPage: React.FC = () => {
                   <div>
                     <h4 className="font-medium text-green-800">Email envoyé</h4>
                     <p className="text-sm text-green-700 mt-1">
-                      Si un compte existe avec l'adresse <strong>{email}</strong>, vous recevrez un email contenant les instructions pour réinitialiser votre mot de passe.
+                      Si un compte existe avec l'adresse email fournie, vous recevrez un email contenant les instructions pour réinitialiser votre mot de passe.
                     </p>
                   </div>
                 </div>

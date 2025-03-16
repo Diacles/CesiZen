@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { User, Lock, Mail, AlertTriangle } from 'lucide-react';
+import { User, Lock, Mail, AlertTriangle, CheckCircle } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/Card';
 import { Input } from '../../components/ui/Input';
+import { useNavigate } from 'react-router-dom';
+import apiService from '../../services/api/Service';
 
 const RegisterPage: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -15,6 +17,8 @@ const RegisterPage: React.FC = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [generalError, setGeneralError] = useState('');
+  const [success, setSuccess] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -73,14 +77,35 @@ const RegisterPage: React.FC = () => {
     if (validateForm()) {
       setIsLoading(true);
       try {
-        // Simuler une requête API
-        setTimeout(() => {
-          console.log('Registration data:', formData);
-          // Rediriger vers la page de connexion ou afficher un message de succès
-          window.location.href = '/login';
-        }, 1500);
+        const response = await apiService.register({
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          password: formData.password
+        });
+
+        if (response.success) {
+          setSuccess(true);
+          // Rediriger après 3 secondes
+          setTimeout(() => {
+            navigate('/login');
+          }, 3000);
+        } else {
+          setGeneralError(response.message || 'Une erreur est survenue lors de l\'inscription.');
+          if (response.errors && response.errors.length > 0) {
+            const newErrors: Record<string, string> = {};
+            response.errors.forEach(err => {
+              if (err.param) {
+                newErrors[err.param] = err.msg;
+              }
+            });
+            setErrors(newErrors);
+          }
+        }
       } catch (error) {
         setGeneralError('Une erreur est survenue lors de l\'inscription. Veuillez réessayer.');
+        console.error('Registration error:', error);
+      } finally {
         setIsLoading(false);
       }
     }
@@ -113,121 +138,135 @@ const RegisterPage: React.FC = () => {
               </div>
             )}
 
-            <form onSubmit={handleSubmit}>
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
-                      Prénom
-                    </label>
-                    <Input
-                      id="firstName"
-                      name="firstName"
-                      type="text"
-                      value={formData.firstName}
-                      onChange={handleChange}
-                      error={errors.firstName}
-                      placeholder="Prénom"
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
-                      Nom
-                    </label>
-                    <Input
-                      id="lastName"
-                      name="lastName"
-                      type="text"
-                      value={formData.lastName}
-                      onChange={handleChange}
-                      error={errors.lastName}
-                      placeholder="Nom"
-                      required
-                    />
+            {success ? (
+              <div className="p-4 bg-green-50 rounded-md">
+                <div className="flex items-start">
+                  <CheckCircle className="h-5 w-5 text-green-500 mr-2 mt-0.5" />
+                  <div>
+                    <h4 className="font-medium text-green-800">Inscription réussie!</h4>
+                    <p className="text-sm text-green-700 mt-1">
+                      Votre compte a été créé avec succès. Vous allez être redirigé vers la page de connexion.
+                    </p>
                   </div>
                 </div>
-
-                <div className="space-y-2">
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                    Email
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Mail className="h-4 w-4 text-gray-400" />
-                    </div>
-                    <Input
-                      id="email"
-                      name="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      error={errors.email}
-                      className="pl-10"
-                      placeholder="exemple@email.com"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                    Mot de passe
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Lock className="h-4 w-4 text-gray-400" />
-                    </div>
-                    <Input
-                      id="password"
-                      name="password"
-                      type="password"
-                      value={formData.password}
-                      onChange={handleChange}
-                      error={errors.password}
-                      className="pl-10"
-                      placeholder="••••••••"
-                      required
-                    />
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, 
-                    un chiffre et un caractère spécial.
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                    Confirmer le mot de passe
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Lock className="h-4 w-4 text-gray-400" />
-                    </div>
-                    <Input
-                      id="confirmPassword"
-                      name="confirmPassword"
-                      type="password"
-                      value={formData.confirmPassword}
-                      onChange={handleChange}
-                      error={errors.confirmPassword}
-                      className="pl-10"
-                      placeholder="••••••••"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <Button
-                  type="submit"
-                  className="w-full bg-[#00BE62] hover:bg-[#00E074]"
-                  isLoading={isLoading}
-                >
-                  {isLoading ? "Inscription en cours..." : "S'inscrire"}
-                </Button>
               </div>
-            </form>
+            ) : (
+              <form onSubmit={handleSubmit}>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
+                        Prénom
+                      </label>
+                      <Input
+                        id="firstName"
+                        name="firstName"
+                        type="text"
+                        value={formData.firstName}
+                        onChange={handleChange}
+                        error={errors.firstName}
+                        placeholder="Prénom"
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
+                        Nom
+                      </label>
+                      <Input
+                        id="lastName"
+                        name="lastName"
+                        type="text"
+                        value={formData.lastName}
+                        onChange={handleChange}
+                        error={errors.lastName}
+                        placeholder="Nom"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                      Email
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <Mail className="h-4 w-4 text-gray-400" />
+                      </div>
+                      <Input
+                        id="email"
+                        name="email"
+                        type="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        error={errors.email}
+                        className="pl-10"
+                        placeholder="exemple@email.com"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                      Mot de passe
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <Lock className="h-4 w-4 text-gray-400" />
+                      </div>
+                      <Input
+                        id="password"
+                        name="password"
+                        type="password"
+                        value={formData.password}
+                        onChange={handleChange}
+                        error={errors.password}
+                        className="pl-10"
+                        placeholder="••••••••"
+                        required
+                      />
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, 
+                      un chiffre et un caractère spécial.
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+                      Confirmer le mot de passe
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <Lock className="h-4 w-4 text-gray-400" />
+                      </div>
+                      <Input
+                        id="confirmPassword"
+                        name="confirmPassword"
+                        type="password"
+                        value={formData.confirmPassword}
+                        onChange={handleChange}
+                        error={errors.confirmPassword}
+                        className="pl-10"
+                        placeholder="••••••••"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <Button
+                    type="submit"
+                    className="w-full bg-[#00BE62] hover:bg-[#00E074]"
+                    isLoading={isLoading}
+                  >
+                    {isLoading ? "Inscription en cours..." : "S'inscrire"}
+                  </Button>
+                </div>
+              </form>
+            )}
 
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">

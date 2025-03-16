@@ -3,6 +3,8 @@ import { Lock, CheckCircle, AlertTriangle } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/Card';
 import { Input } from '../../components/ui/Input';
+import { useNavigate } from 'react-router-dom';
+import apiService from '../../services/api/Service';
 
 const ResetPasswordPage: React.FC = () => {
   const [password, setPassword] = useState('');
@@ -12,6 +14,7 @@ const ResetPasswordPage: React.FC = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [invalidToken, setInvalidToken] = useState(false);
+  const navigate = useNavigate();
 
   // Récupérer le token depuis l'URL
   useEffect(() => {
@@ -45,14 +48,25 @@ const ResetPasswordPage: React.FC = () => {
     setIsLoading(true);
 
     try {
-      // Simuler une requête API
-      setTimeout(() => {
-        console.log('Reset password with token:', token, 'New password length:', password.length);
+      const response = await apiService.resetPassword(token, password);
+      
+      if (response.success) {
         setSuccess(true);
-        setIsLoading(false);
-      }, 1000);
+        // Rediriger vers la page de connexion après 3 secondes
+        setTimeout(() => {
+          navigate('/login');
+        }, 3000);
+      } else {
+        if (response.message?.includes('Token invalide') || response.message?.includes('expiré')) {
+          setInvalidToken(true);
+        } else {
+          setError(response.message || 'Erreur lors de la réinitialisation du mot de passe.');
+        }
+      }
     } catch (err) {
       setError('Erreur lors de la réinitialisation du mot de passe. Veuillez réessayer.');
+      console.error('Password reset error:', err);
+    } finally {
       setIsLoading(false);
     }
   };
@@ -77,12 +91,12 @@ const ResetPasswordPage: React.FC = () => {
                   </p>
                 </div>
               </div>
-              <a 
-                href="/forgot-password" 
-                className="inline-block w-full text-center py-2 px-4 border border-transparent rounded-md text-sm font-medium text-white bg-[#00BE62] hover:bg-[#00E074]"
+              <Button 
+                onClick={() => navigate('/forgot-password')}
+                className="w-full bg-primary hover:bg-secondary"
               >
                 Demander un nouveau lien
-              </a>
+              </Button>
             </CardContent>
           </Card>
         </div>
@@ -95,7 +109,7 @@ const ResetPasswordPage: React.FC = () => {
       <div className="w-full max-w-md">
         {/* Logo et en-tête */}
         <div className="text-center mb-8">
-          <div className="inline-block p-3 bg-gradient-to-br from-[#00BE62] to-[#00E074] rounded-xl mb-4">
+          <div className="inline-block p-3 bg-gradient-to-br from-primary to-secondary rounded-xl mb-4">
             <Lock className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900">Réinitialisation du mot de passe</h1>
@@ -124,17 +138,17 @@ const ResetPasswordPage: React.FC = () => {
                   <div>
                     <h4 className="font-medium text-green-800">Mot de passe réinitialisé</h4>
                     <p className="text-sm text-green-700 mt-1">
-                      Votre mot de passe a été modifié avec succès. Vous pouvez maintenant vous connecter avec votre nouveau mot de passe.
+                      Votre mot de passe a été modifié avec succès. Vous allez être redirigé vers la page de connexion dans quelques secondes.
                     </p>
                   </div>
                 </div>
                 <div className="mt-4">
-                  <a 
-                    href="/login" 
-                    className="inline-block w-full text-center py-2 px-4 border border-transparent rounded-md text-sm font-medium text-white bg-[#00BE62] hover:bg-[#00E074]"
+                  <Button 
+                    onClick={() => navigate('/login')}
+                    className="w-full bg-primary hover:bg-secondary"
                   >
                     Se connecter
-                  </a>
+                  </Button>
                 </div>
               </div>
             ) : (
@@ -186,7 +200,7 @@ const ResetPasswordPage: React.FC = () => {
 
                   <Button
                     type="submit"
-                    className="w-full bg-[#00BE62] hover:bg-[#00E074]"
+                    className="w-full bg-primary hover:bg-secondary"
                     isLoading={isLoading}
                   >
                     {isLoading ? "Réinitialisation en cours..." : "Réinitialiser le mot de passe"}
@@ -198,7 +212,7 @@ const ResetPasswordPage: React.FC = () => {
             {!success && (
               <div className="mt-6 text-center">
                 <p className="text-sm text-gray-600">
-                  <a href="/login" className="text-[#00BE62] hover:underline">
+                  <a href="/login" className="text-primary hover:underline">
                     Retour à la connexion
                   </a>
                 </p>

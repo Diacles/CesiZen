@@ -3,12 +3,8 @@ import { User, Lock, AlertTriangle } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/Card';
 import { Input } from '../../components/ui/Input';
-
-interface LoginCredentials {
-  email: string;
-  password: string;
-  rememberMe: boolean;
-}
+import { useNavigate } from 'react-router-dom';
+import apiService from '../../services/api/Service';
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -16,6 +12,7 @@ const LoginPage: React.FC = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -23,18 +20,24 @@ const LoginPage: React.FC = () => {
     setIsLoading(true);
 
     try {
-      // Simuler une requête API
-      setTimeout(() => {
-        // Logique de connexion à implémenter avec l'API
-        console.log('Login attempt with:', { email, password, rememberMe });
+      const response = await apiService.login(email, password);
+      
+      if (response.success) {
+        // If remember me is checked, we could implement additional logic here
+        // For example, set a longer expiration on the token
+        if (rememberMe) {
+          localStorage.setItem('rememberMe', 'true');
+        }
         
-        // Redirection vers le dashboard après connexion réussie
-        window.location.href = '/dashboard';
-        
-        setIsLoading(false);
-      }, 1000);
+        // Redirect to dashboard after successful login
+        navigate('/dashboard');
+      } else {
+        setError(response.message || 'Identifiants incorrects. Veuillez réessayer.');
+      }
     } catch (err) {
-      setError('Identifiants incorrects. Veuillez réessayer.');
+      setError('Une erreur est survenue lors de la connexion. Veuillez réessayer.');
+      console.error('Login error:', err);
+    } finally {
       setIsLoading(false);
     }
   };
