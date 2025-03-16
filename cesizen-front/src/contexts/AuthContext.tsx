@@ -6,6 +6,7 @@ interface User {
   firstName: string;
   lastName: string;
   email: string;
+  roles?: string[]; // Ajout du champ roles
   // Ajoutez d'autres propriétés selon votre modèle utilisateur
 }
 
@@ -42,12 +43,24 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setUser(null);
       return false;
     }
-
+  
     try {
-      const response = await apiService.getProfile();
-
-      if (response.success && "data" in response) { // Vérifie que 'data' existe bien
-        setUser(response.data);
+      // Récupérer le profil utilisateur
+      const profileResponse = await apiService.getProfile();
+      
+      if (profileResponse.success && "data" in profileResponse) {
+        // Récupérer les rôles utilisateur
+        const rolesResponse = await apiService.getUserRoles();
+        
+        // Normaliser les données utilisateur
+        const userData = {
+          ...profileResponse.data,
+          firstName: profileResponse.data.firstName || profileResponse.data.first_name,
+          lastName: profileResponse.data.lastName || profileResponse.data.last_name,
+          roles: rolesResponse.success ? rolesResponse.data.map((role: any) => role.name) : []
+        };
+        
+        setUser(userData);
         setIsAuthenticated(true);
         return true;
       } else {
@@ -64,7 +77,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setUser(null);
       return false;
     }
-  };
+  };  
 
   const login = async (email: string, password: string) => {
     console.log("Login called");

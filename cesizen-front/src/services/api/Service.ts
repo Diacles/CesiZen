@@ -185,6 +185,19 @@ const apiService = {
     localStorage.removeItem('token');
     triggerAuthEvent(false);
   },
+
+  getUserRoles: async () => {
+    try {
+      const response: AxiosResponse<ApiResponse> = await apiClient.get('/users/roles');
+      return response.data;
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Erreur lors de la récupération des rôles',
+        errors: error.response?.data?.errors,
+      };
+    }
+  },
 };
 
 export default apiService;

@@ -21,6 +21,7 @@ router.post('/reset-password', resetPasswordValidation, userController.resetPass
 // Routes protégées
 router.get('/profile', auth, userController.getProfile);
 router.put('/profile', auth, userController.updateProfile);
+router.get('/roles', auth, userController.getUserRoles); // Nouvelle route pour les rôles
 
 // Routes admin
 router.get('/admin/users', auth, checkRole(['ADMIN']), adminController.getAllUsers);

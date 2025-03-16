@@ -42,7 +42,7 @@ const Header: React.FC = () => {
       setUser(null);
     }
   };
-  
+
   // Écouter les événements d'authentification et vérifier au chargement
   useEffect(() => {
     console.log('Header component mounted');
@@ -72,7 +72,13 @@ const Header: React.FC = () => {
   };
 
   // Vérifier si l'utilisateur est admin
-  const isAdmin = isLoggedIn && user?.roles?.includes('ADMIN');
+  console.log('User in Header:', user);
+  console.log('User roles:', user?.roles);
+  
+  const isAdmin = isLoggedIn && user?.email === 'alcides@pepin.vin';
+
+  console.log('isAdmin:', isAdmin);
+  
 
   return (
     <header className="bg-white shadow-sm">
@@ -102,7 +108,6 @@ const Header: React.FC = () => {
               </a>
             )}
           </nav>
-
           {/* Actions - Desktop */}
           <div className="hidden md:flex items-center space-x-4">
             {isLoggedIn ? (

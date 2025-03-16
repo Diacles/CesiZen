@@ -182,6 +182,28 @@ const userController = {
         }
     }),
 
+    getUserRoles: asyncHandler(async (req, res) => {
+        try {
+            const userId = req.user.id;
+            
+            const result = await db.query(
+                `SELECT r.name, r.description
+                FROM user_roles ur
+                JOIN roles r ON r.id = ur.role_id
+                WHERE ur.user_id = $1`,
+                [userId]
+            );
+            
+            res.status(200).json({
+                success: true,
+                data: result.rows
+            });
+        } catch (error) {
+            console.error('Erreur lors de la récupération des rôles:', error);
+            throw error;
+        }
+    }), 
+
     // POST /api/users/reset-password
     resetPassword: asyncHandler(async (req, res) => {
         const { token, newPassword } = req.body;
