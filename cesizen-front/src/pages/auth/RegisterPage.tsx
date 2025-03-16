@@ -117,7 +117,7 @@ const RegisterPage: React.FC = () => {
         {/* Logo et en-tête */}
         <div className="text-center mb-8">
           <div className="inline-block p-3 bg-gradient-to-br from-[#00BE62] to-[#00E074] rounded-xl mb-4">
-            <User className="w-8 h-8 text-white" />
+            <User className="w-8 h-8 text-black" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900">Créer un compte CESIZen</h1>
           <p className="text-gray-600 mt-2">Rejoignez-nous pour prendre soin de votre santé mentale</p>

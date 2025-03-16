@@ -78,7 +78,7 @@ const Header: React.FC = () => {
           {/* Logo */}
           <a href="/" className="flex items-center">
             <div className="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center mr-2">
-              <span className="text-white font-bold">C</span>
+              <span className="text-black font-bold">C</span>
             </div>
             <span className="text-xl font-bold text-gray-900">CESIZen</span>
           </a>
@@ -123,7 +123,7 @@ const Header: React.FC = () => {
                 <a href="/login" className="text-gray-700 hover:text-primary transition">Connexion</a>
                 <a 
                   href="/register" 
-                  className="bg-primary hover:bg-secondary text-white px-4 py-2 rounded-lg transition"
+                  className="bg-primary hover:bg-secondary text-black px-4 py-2 rounded-lg transition"
                 >
                   S'inscrire
                 </a>
@@ -172,7 +172,7 @@ const Header: React.FC = () => {
                   <a href="/login" className="text-gray-700 hover:text-primary transition">Connexion</a>
                   <a 
                     href="/register" 
-                    className="bg-primary hover:bg-secondary text-white px-4 py-2 rounded-lg transition text-center"
+                    className="bg-primary hover:bg-secondary text-black px-4 py-2 rounded-lg transition text-center"
                   >
                     S'inscrire
                   </a>

@@ -128,7 +128,7 @@ const ProfilePage: React.FC = () => {
     <div className="container mx-auto max-w-3xl py-8 px-4">
       <div className="text-center mb-8">
         <div className="inline-block p-4 bg-gradient-to-br from-primary to-secondary rounded-full mb-4">
-          <User className="w-10 h-10 text-white" />
+          <User className="w-10 h-10 text-black" />
         </div>
         <h1 className="text-3xl font-bold text-gray-900">Mon profil</h1>
         <p className="text-gray-600 mt-2">Consultez et modifiez vos informations personnelles</p>

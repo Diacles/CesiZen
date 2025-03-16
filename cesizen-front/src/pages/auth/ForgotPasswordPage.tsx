@@ -44,7 +44,7 @@ const ForgotPasswordPage: React.FC = () => {
         {/* Logo et en-tête */}
         <div className="text-center mb-8">
           <div className="inline-block p-3 bg-gradient-to-br from-[#00BE62] to-[#00E074] rounded-xl mb-4">
-            <Mail className="w-8 h-8 text-white" />
+            <Mail className="w-8 h-8 text-black" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900">Réinitialisation du mot de passe</h1>
           <p className="text-gray-600 mt-2">Récupérez l'accès à votre compte</p>
@@ -79,7 +79,7 @@ const ForgotPasswordPage: React.FC = () => {
                 <div className="mt-4">
                   <a 
                     href="/login" 
-                    className="inline-block w-full text-center py-2 px-4 border border-transparent rounded-md text-sm font-medium text-white bg-[#00BE62] hover:bg-[#00E074]"
+                    className="inline-block w-full text-center py-2 px-4 border border-transparent rounded-md text-sm font-medium text-black bg-[#00BE62] hover:bg-[#00E074]"
                   >
                     Retour à la connexion
                   </a>

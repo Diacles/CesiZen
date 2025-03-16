@@ -57,7 +57,7 @@ const LoginPage: React.FC = () => {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="inline-block p-3 bg-gradient-to-br from-[#00BE62] to-[#00E074] rounded-xl mb-4">
-            <User className="w-8 h-8 text-white" />
+            <User className="w-8 h-8 text-black" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900">Connexion à CESIZen</h1>
           <p className="text-gray-600 mt-2">Accédez à votre espace personnel</p>

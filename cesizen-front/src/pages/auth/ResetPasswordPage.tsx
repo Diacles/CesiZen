@@ -110,7 +110,7 @@ const ResetPasswordPage: React.FC = () => {
         {/* Logo et en-tête */}
         <div className="text-center mb-8">
           <div className="inline-block p-3 bg-gradient-to-br from-primary to-secondary rounded-xl mb-4">
-            <Lock className="w-8 h-8 text-white" />
+            <Lock className="w-8 h-8 text-black" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900">Réinitialisation du mot de passe</h1>
           <p className="text-gray-600 mt-2">Créez un nouveau mot de passe sécurisé</p>

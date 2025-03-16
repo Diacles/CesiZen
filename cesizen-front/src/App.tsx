@@ -13,6 +13,9 @@ import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 // Importer d'autres pages au fur et à mesure que nous les créons
 // import Dashboard from './pages/dashboard/Dashboard';
 // import EmotionTracker from './pages/emotions/EmotionTracker';
+import EmotionTrackerPage from './pages/emotions/EmotionTrackerPage';
+import EmotionStatisticsPage from './pages/emotions/EmotionStatisticsPage';
+
 import ProfilePage from './pages/profile/ProfilePage';
 
 const App: React.FC = () => {
@@ -52,13 +55,25 @@ const App: React.FC = () => {
             </MainLayout>
           } />
 
+          <Route path="/emotions" element={
+            <MainLayout>
+              <EmotionTrackerPage />
+            </MainLayout>
+          } />
+
+          <Route path="/emotions/statistics" element={
+            <MainLayout>
+              <EmotionStatisticsPage />
+            </MainLayout>
+          } />
+
           {/* Route 404 */}
           <Route path="*" element={
             <MainLayout>
               <div className="container mx-auto px-4 py-16 text-center">
                 <h1 className="text-4xl font-bold text-gray-900 mb-4">404</h1>
                 <p className="text-xl text-gray-600 mb-8">Page non trouvée</p>
-                <a href="/" className="bg-primary hover:bg-secondary text-white px-4 py-2 rounded-lg transition">
+                <a href="/" className="bg-primary hover:bg-secondary text-black px-4 py-2 rounded-lg transition">
                   Retour à l'accueil
                 </a>
               </div>

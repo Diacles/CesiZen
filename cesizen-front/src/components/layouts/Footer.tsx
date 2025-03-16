@@ -12,7 +12,7 @@ const Footer: React.FC = () => {
           <div className="col-span-1">
             <a href="/" className="flex items-center mb-4">
               <div className="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center mr-2">
-                <span className="text-white font-bold">C</span>
+                <span className="text-black font-bold">C</span>
               </div>
               <span className="text-xl font-bold text-gray-900">CESIZen</span>
             </a>

@@ -32,6 +32,27 @@ CREATE TABLE password_reset_tokens (
     WHERE used_at IS NULL AND expires_at > CURRENT_TIMESTAMP
 );
 
+CREATE TABLE emotion_categories (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(50) NOT NULL UNIQUE,
+    description TEXT
+);
+
+CREATE TABLE emotions (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    category_id INTEGER REFERENCES emotion_categories(id) ON DELETE CASCADE
+);
+
+CREATE TABLE user_emotions (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    emotion_id INTEGER REFERENCES emotions(id) ON DELETE CASCADE,
+    intensity INTEGER CHECK (intensity BETWEEN 1 AND 5),
+    note TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Index pour accélérer la recherche des tokens
 CREATE INDEX idx_valid_tokens ON password_reset_tokens (token, expires_at)
 WHERE used_at IS NULL;
