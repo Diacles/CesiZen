@@ -26,10 +26,7 @@ CREATE TABLE password_reset_tokens (
     token VARCHAR(255) NOT NULL,
     expires_at TIMESTAMP NOT NULL,
     used_at TIMESTAMP,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    
-    CONSTRAINT unique_active_token UNIQUE (user_id, token) 
-    WHERE used_at IS NULL AND expires_at > CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE emotion_categories (
@@ -53,9 +50,8 @@ CREATE TABLE user_emotions (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Index pour accélérer la recherche des tokens
-CREATE INDEX idx_valid_tokens ON password_reset_tokens (token, expires_at)
-WHERE used_at IS NULL;
+-- Index pour accélérer la recherche des tokens (après création de la table)
+CREATE INDEX idx_valid_tokens ON password_reset_tokens (token, expires_at);
 
 -- Association praticien-patient
 CREATE TABLE practitioner_patients (
